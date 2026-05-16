@@ -17,8 +17,9 @@ public class DiscreteAttribute extends Attribute{
 
     }
 
+    @Override
     public Iterator<String> iterator(){
         return values.iterator();
         }
-    }
+}
 
