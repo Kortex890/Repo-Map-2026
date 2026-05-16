@@ -3,6 +3,8 @@ package tree;
 import data.Attribute;
 import data.Data;
 import data.DiscreteAttribute;
+import java.util.List;
+import java.util.ArrayList;
 
 abstract class SplitNode extends Node {
 	// Classe che colelzione informazioni descrittive dello split
@@ -46,7 +48,7 @@ abstract class SplitNode extends Node {
 
 	Attribute attribute;
 
-	SplitInfo mapSplit[];
+	List<SplitInfo> mapSplit=new ArrayList<SplitInfo>();
 	
 	double splitVariance;
 
@@ -54,6 +56,15 @@ abstract class SplitNode extends Node {
 
 	abstract int testCondition (Object value);
 
+	public int compareTo(SplitNode o) {
+		if (this.splitVariance < o.splitVariance) {
+			return 1;  // Minore varianza residua significa maggiore Information Gain
+		} else if (this.splitVariance > o.splitVariance) {
+			return -1; // Maggiore varianza residua significa minore Information Gain
+		} else {
+			return 0;  // Strutture con varianza identica
+		}
+	}
 
 	SplitNode(Data trainingSet, int beginExampleIndex, int endExampleIndex, Attribute attribute) {
 		super(trainingSet, beginExampleIndex, endExampleIndex);
@@ -63,8 +74,8 @@ abstract class SplitNode extends Node {
 
 		//compute variance
 		splitVariance = 0;
-		for (int i = 0; i < mapSplit.length; i++) {
-			double localVariance = new LeafNode(trainingSet, mapSplit[i].getBeginindex(), mapSplit[i].getEndIndex()).getVariance();
+		for (int i = 0; i < mapSplit.size(); i++) {
+			double localVariance = new LeafNode(trainingSet, mapSplit.get(i).getBeginindex(), mapSplit.get(i).getEndIndex()).getVariance();
 			splitVariance += (localVariance);
 		}
 	}
@@ -78,17 +89,17 @@ abstract class SplitNode extends Node {
 	}
 	
 	int getNumberOfChildren(){
-		return mapSplit.length;
+		return mapSplit.size();
 	}
 
 	SplitInfo getSplitInfo(int child){
-		return mapSplit[child];
+		return mapSplit.get(child);
 	}
 
 	String formulateQuery(){
 		String query = "";
-		for(int i=0;i<mapSplit.length;i++)
-			query+= (i + ":" + attribute + mapSplit[i].getComparator() +mapSplit[i].getSplitValue())+"\n";
+		for(int i=0;i<mapSplit.size();i++)
+			query+= (i + ":" + attribute + mapSplit.get(i).getComparator() +mapSplit.get(i).getSplitValue())+"\n";
 		return query;
 	}
 	SplitNode determineBestSplitNode(Data trainingSet, int begin, int end) {
@@ -128,8 +139,8 @@ abstract class SplitNode extends Node {
 	public String toString(){
 		String v= "SPLIT : attribute=" +attribute +" "+ super.toString()+  " Split Variance: " + getVariance()+ "\n" ;
 
-		for(int i=0;i<mapSplit.length;i++){
-			v+= "\t"+mapSplit[i]+"\n";
+		for(int i=0;i<mapSplit.size();i++){
+			v+= "\t"+mapSplit.get(i)+"\n";
 		}
 
 		return v;
