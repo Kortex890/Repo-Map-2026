@@ -41,7 +41,7 @@ public class DiscreteNode extends SplitNode{
                 // Il valore è cambiato (es. passiamo da 'A' a 'B').
                 // Chiudiamo il blocco precedente creando uno SplitInfo.
                 // Il costruttore richiede: valore, inizio, fine, id del figlio
-                mapSplit[splitIndex] = new SplitInfo(currentValue, currentBegin, i - 1, splitIndex);
+                mapSplit.add(new SplitInfo(currentValue, currentBegin, i-1, splitIndex));
 
                 // Aggiorniamo le variabili per iniziare il tracciamento del nuovo blocco
                 currentBegin = i;
@@ -52,17 +52,18 @@ public class DiscreteNode extends SplitNode{
 
         // 5. Fuori dal ciclo, dobbiamo aggiungere l'ultimo blocco residuo
         // (es. le 'D' finali nella tua tabella)
-        mapSplit[splitIndex] = new SplitInfo(currentValue, currentBegin, endExampleIndex, splitIndex);
+
+        mapSplit.add(new SplitInfo(currentValue, currentBegin, endExampleIndex, splitIndex));
     }
 
     int testCondition(Object value) {
 
         // Scorre tutti gli oggetti SplitInfo collezionati nell'array
-        for (int i = 0; i < mapSplit.length; i++) {
+        for (int i = 0; i < mapSplit.size(); i++) {
 
             // Confronta il valore in input con lo splitValue salvato
             // Usiamo .equals() perché stiamo confrontando degli Object (generalmente Stringhe per i valori discreti)
-            if (mapSplit[i].splitValue.equals(value)) {
+            if (mapSplit.get(i).splitValue.equals(value)) {
                 return i; // Test positivo: restituisce l'indice (posizione nell'array / numero del ramo)
             }
         }
@@ -102,9 +103,9 @@ public class DiscreteNode extends SplitNode{
         v += super.toString() + "\n";
 
         if (mapSplit != null) {
-            for (int i = 0; i < mapSplit.length; i++) {
-                v += "child " + i + " split value" + mapSplit[i].comparator + mapSplit[i].splitValue
-                        + "[Examples:" + mapSplit[i].beginIndex + "-" + mapSplit[i].endIndex + "]\n";
+            for (int i = 0; i < mapSplit.size(); i++) {
+                v += "child " + i + " split value" + mapSplit.get(i).comparator + mapSplit.get(i).splitValue
+                        + "[Examples:" + mapSplit.get(i).beginIndex + "-" + mapSplit.get(i).endIndex + "]\n";
             }
         }
         return v;
