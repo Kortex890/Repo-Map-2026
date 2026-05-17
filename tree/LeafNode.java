@@ -6,7 +6,6 @@ public class LeafNode extends Node{
     double predictedClassValue;
     public LeafNode(Data trainingSet, int beginExampleIndex, int endExampleIndex) {
         super(trainingSet, beginExampleIndex, endExampleIndex);
-        /*
         int numberOfExamplesInNode = endExampleIndex - beginExampleIndex + 1;
         double sum = 0.0;
         for (int i = beginExampleIndex; i <= endExampleIndex; i++) {
@@ -18,7 +17,7 @@ public class LeafNode extends Node{
             double diff = trainingSet.getClassValue(i) - this.predictedClassValue;
             sumSquaredDiff += (diff * diff);
         }
-        this.variance = sumSquaredDiff / numberOfExamplesInNode;*/
+        this.variance = sumSquaredDiff / numberOfExamplesInNode;
     }
 
     double getPredictedClassValue() {

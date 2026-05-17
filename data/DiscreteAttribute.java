@@ -9,7 +9,9 @@ public class DiscreteAttribute extends Attribute implements Iterable<String>{
 
     public DiscreteAttribute(String name, int index, String value[]){
         super(name, index);
-        this.values = values;
+        for (String v: value){
+            this.values.add(v);
+        }
     }
 
     public int getNumberofDistinctValues(){

@@ -101,20 +101,15 @@ public class RegressionTree {
 
 	}
 	// Scandisce ciascun ramo dell'albero completo dalla radice alla foglia/
-	public void printRules() {
+	public void printRules(){
 		if (root instanceof LeafNode) {
-			// Caso limite: l'intero albero è solo una foglia
 			System.out.println("==> Class " + ((LeafNode) root).getPredictedClassValue());
 		} else {
-			// La radice è un nodo di split, avviamo l'attraversamento
 			SplitNode splitRoot = (SplitNode) root;
-
 			for (int i = 0; i < childTree.length; i++) {
-				// Recuperiamo le informazioni del ramo corrente per iniziare la stringa
-				// (es. "motor=A")
 				String condition = splitRoot.getAttribute().getName() +
-						splitRoot.getSplitInfo(i).comparator +
-						splitRoot.getSplitInfo(i).splitValue;
+						splitRoot.getSplitInfo(i).getComparator() + // Sostituito .comparator con .getComparator()
+						splitRoot.getSplitInfo(i).getSplitValue();   // Sostituito .splitValue con .getSplitValue()
 
 				// Invochiamo il metodo ricorsivo sul figlio passandogli la prima condizione
 				childTree[i].printRules(condition);
@@ -131,11 +126,11 @@ public class RegressionTree {
 			SplitNode splitRoot = (SplitNode) root;
 
 			for (int i = 0; i < childTree.length; i++) {
-				// Aggiungiamo " AND " e la nuova condizione alla stringa current ereditata dal padre
+				// Utilizziamo i metodi getter pubblici o l'accesso corretto tramite gli oggetti restituiti da getSplitInfo(i)
 				String newCondition = current + " AND " +
 						splitRoot.getAttribute().getName() +
-						splitRoot.getSplitInfo(i).comparator +
-						splitRoot.getSplitInfo(i).splitValue;
+						splitRoot.getSplitInfo(i).getComparator() + // Usiamo il getter esistente in SplitInfo
+						splitRoot.getSplitInfo(i).getSplitValue();   // Usiamo il getter esistente in SplitInfo
 
 				// Chiamata ricorsiva al livello inferiore
 				childTree[i].printRules(newCondition);
