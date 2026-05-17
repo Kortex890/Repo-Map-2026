@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class DiscreteAttribute extends Attribute{
+public class DiscreteAttribute extends Attribute implements Iterable<String>{
     private Set<String> values=new TreeSet<>();
 
     public DiscreteAttribute(String name, int index, String value[]){

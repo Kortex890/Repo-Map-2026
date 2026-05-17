@@ -12,7 +12,7 @@ public class  Data {
 
 	private Object data [][];
 	private int numberOfExamples;
-	private List<Attribute> explanatorySet[];  //Modifcata in List
+	private List<Attribute> explanatorySet;  //Modifcata in List
 	private ContinuousAttribute classAttribute;
 
 	public Data(String fileName)throws FileNotFoundException{
@@ -28,7 +28,7 @@ public class  Data {
 		//popolare explanatory Set
 		//@schema 4
 		//inizializzazione della lista
-		explanatorySet = new LinkedList<Attribute>;
+		explanatorySet = new LinkedList<Attribute>();
 		short iAttribute = 0;
 		line = sc.nextLine();
 		while (!line.contains("@data")) {
@@ -50,7 +50,7 @@ public class  Data {
 		numberOfExamples = new Integer(line.split(" ")[1]);
 
 		//popolare data
-		data = new Object[numberOfExamples][explanatorySet.length + 1];
+		data = new Object[numberOfExamples][explanatorySet.size() + 1];
 		short iRow = 0;
 		while (sc.hasNextLine()) {
 			line = sc.nextLine();
@@ -102,7 +102,7 @@ public class  Data {
 			for(int j=0;j<explanatorySet.size();j++)
 				value+=data[i][j]+",";
 
-			value+=data[i][explanatorySet.length]+"\n";
+			value+=data[i][explanatorySet.size()]+"\n";
 		}
 		return value;
 

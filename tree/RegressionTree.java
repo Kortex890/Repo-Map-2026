@@ -6,6 +6,8 @@ import data.DiscreteAttribute;
 import data.UnknownValueException;
 import utility.Keyboard;
 
+import java.util.TreeSet;
+
 public class RegressionTree {
 	Node root;
 	RegressionTree childTree[];
@@ -59,33 +61,30 @@ public class RegressionTree {
 	}
 
 	SplitNode determineBestSplitNode(Data trainingSet, int begin, int end) {
-
-		SplitNode bestSplitNode = null;
-		double minVariance = Double.MAX_VALUE; // Partiamo dal valore più alto possibile
-		Attribute bestAttribute = null; // Memorizziamo l'attributo migliore per l'ordinamento finale
+		//definizione del contenitore TreeSet per contenere gli SplitNode candidati
+		TreeSet<SplitNode> ts= new TreeSet<SplitNode>();
 
 		int numAttributes = trainingSet.getNumberOfExplanatoryAttributes();
 
-		// 1. Per ciascun attributo indipendente...
+		// 1. Popolamento dell'insieme ordinato con tutti i possibili split
 		for (int i = 0; i < numAttributes; i++) {
-
 			// Assumiamo che gli attributi esplicativi siano discreti in questa fase
 			DiscreteAttribute currentAttribute = (DiscreteAttribute) trainingSet.getExplanatoryAttribute(i);
-
-			// 2. Istanzia il tree.DiscreteNode associato
+			// Istanzia il tree.DiscreteNode associato
 			DiscreteNode currentNode = new DiscreteNode(trainingSet, begin, end, currentAttribute);
+			//L'inserimento inserisce l'elemento mantenendo l'ordine stabilito da compareTo
+			ts.add(currentNode);
 
-			// 3. Seleziona il nodo di split con minore varianza
-			if (currentNode.getVariance() < minVariance) {
-				minVariance = currentNode.getVariance();
-				bestSplitNode = currentNode;
-				bestAttribute = currentAttribute;
-			}
 		}
 
-		// 4. Ordina la porzione di trainingSet corrente rispetto all'attributo indipendente del nodo di split selezionato
-		if (bestAttribute != null) {
-			trainingSet.sort(bestAttribute, begin, end);
+		// 2. Selezione del miglior split.
+		// Dato che compareTo restituisce 1 se la varianza è minore, l'elemento in cima
+		// estratto tramite .first() sarà lo split ottimale con minore splitVariance.
+		SplitNode bestSplitNode = ts.first();
+
+		// 3. Ordina la porzione di trainingSet corrente rispetto all'attributo del miglior nodo selezionato
+		if (bestSplitNode != null && bestSplitNode.getAttribute() != null) {
+			trainingSet.sort(bestSplitNode.getAttribute(), begin, end);
 		}
 
 		// 5. Restituisce il nodo selezionato
