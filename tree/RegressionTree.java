@@ -150,7 +150,7 @@ public class RegressionTree {
 			int risp;
 			System.out.println(((SplitNode)root).formulateQuery());
 			risp = Keyboard.readInt();
-			if(risp == -1 || risp >= root.getNumberOfChildren()-1){
+			if(risp == -1 || risp >= root.getNumberOfChildren()){
 				throw new UnknownValueException("il valore dovrebbe essere tra 1 e "+ (root.getNumberOfChildren()-1));
 			}else{
 				return childTree[risp].PredictClass();
