@@ -26,8 +26,8 @@ public class DiscreteNode extends SplitNode{
             }
         }
 
-        // 3. Inizializziamo l'array mapSplit con la dimensione corretta trovata
-        this.mapSplit = new SplitInfo[numSplits];
+        // 3. Inizializziamo la List mapSplit istanziando un ArrayList vuoto (la dimensione sarà dinamica)
+        this.mapSplit = new java.util.ArrayList<SplitInfo>();
 
         // 4. Scorriamo di nuovo i dati per creare e salvare gli oggetti SplitInfo
         int splitIndex = 0; // Indice del figlio corrente
