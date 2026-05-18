@@ -18,14 +18,8 @@ public class  Data {
 	public Data(String fileName)throws FileNotFoundException{
 	try {
 		Scanner sc;
-		if (fileName.equalsIgnoreCase("tastiera")) {
-			System.out.println("[Modalità Manuale] Incolla o digita ora tutto il dataset riga per riga:");
-			sc = new Scanner(System.in);
-		} else {
-			// Altrimenti cerca il file sul disco normalmente
-			File inFile = new File(fileName);
-			sc = new Scanner(inFile);
-		}
+		File inFile = new File(fileName);
+		sc = new Scanner(inFile);
 		String line = sc.nextLine();
 		if (!line.contains("@schema"))
 			throw new RuntimeException("Errore nello schema");
