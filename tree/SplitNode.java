@@ -6,7 +6,7 @@ import data.DiscreteAttribute;
 import java.util.List;
 import java.util.ArrayList;
 
-abstract class SplitNode extends Node {
+abstract class SplitNode extends Node implements Comparable<SplitNode>{
 	// Classe che colelzione informazioni descrittive dello split
 	class SplitInfo{
 		Object splitValue;
@@ -145,5 +145,8 @@ abstract class SplitNode extends Node {
 
 		return v;
 	}
+
+	// Implementazione del confronto biologico basato sulla varianza dello split
+
 
 }
