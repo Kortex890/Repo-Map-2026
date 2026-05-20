@@ -17,5 +17,10 @@ public abstract class Attribute {
     public int getIndex() {
         return this.index;
     }
+
+    @Override
+    public String toString(){
+        return this.name;
+    }
 }
 
