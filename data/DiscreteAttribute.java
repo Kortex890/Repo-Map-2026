@@ -4,12 +4,14 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class DiscreteAttribute extends Attribute{
+public class DiscreteAttribute extends Attribute implements Iterable<String>{
     private Set<String> values=new TreeSet<>();
 
     public DiscreteAttribute(String name, int index, String value[]){
         super(name, index);
-        this.values = values;
+        for (String v: value){
+            this.values.add(v);
+        }
     }
 
     public int getNumberofDistinctValues(){
@@ -17,8 +19,9 @@ public class DiscreteAttribute extends Attribute{
 
     }
 
+    @Override
     public Iterator<String> iterator(){
         return values.iterator();
         }
-    }
+}
 

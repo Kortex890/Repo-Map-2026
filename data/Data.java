@@ -3,6 +3,8 @@ package data;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.List;            //Aggiunto
+import java.util.LinkedList; 	  //Aggiunto
 
 
 
@@ -10,14 +12,14 @@ public class  Data {
 
 	private Object data [][];
 	private int numberOfExamples;
-	private Attribute explanatorySet[];
+	private List<Attribute> explanatorySet;  //Modifcata in List
 	private ContinuousAttribute classAttribute;
 
 	public Data(String fileName)throws FileNotFoundException{
 	try {
+		Scanner sc;
 		File inFile = new File(fileName);
-
-		Scanner sc = new Scanner(inFile);
+		sc = new Scanner(inFile);
 		String line = sc.nextLine();
 		if (!line.contains("@schema"))
 			throw new RuntimeException("Errore nello schema");
@@ -25,8 +27,8 @@ public class  Data {
 
 		//popolare explanatory Set
 		//@schema 4
-
-		explanatorySet = new Attribute[new Integer(s[1])];
+		//inizializzazione della lista
+		explanatorySet = new LinkedList<Attribute>();
 		short iAttribute = 0;
 		line = sc.nextLine();
 		while (!line.contains("@data")) {
@@ -34,7 +36,7 @@ public class  Data {
 			if (s[0].equals("@desc")) { // aggiungo l'attributo allo spazio descrittivo
 				//@desc motor discrete A,B,C,D,E
 				String discreteValues[] = s[2].split(",");
-				explanatorySet[iAttribute] = new DiscreteAttribute(s[1], iAttribute, discreteValues);
+				explanatorySet.add(new DiscreteAttribute(s[1], iAttribute, discreteValues));
 			} else if (s[0].equals("@target"))
 				classAttribute = new ContinuousAttribute(s[1], iAttribute);
 
@@ -48,7 +50,7 @@ public class  Data {
 		numberOfExamples = new Integer(line.split(" ")[1]);
 
 		//popolare data
-		data = new Object[numberOfExamples][explanatorySet.length + 1];
+		data = new Object[numberOfExamples][explanatorySet.size() + 1];
 		short iRow = 0;
 		while (sc.hasNextLine()) {
 			line = sc.nextLine();
@@ -62,7 +64,7 @@ public class  Data {
 		}
 		sc.close();
 	} catch (FileNotFoundException e){
-			throw new TrainingDataException(e.toString());
+			throw new RuntimeException(e.toString());
 		}
 	}
 
@@ -70,16 +72,16 @@ public class  Data {
 		return numberOfExamples;
 	}
 
-	public int getNumberOfExplanatoryAttributes(){
-		return this.explanatorySet.length;
+	public int getNumberOfExplanatoryAttributes() {
+		return this.explanatorySet.size();
 	}
 
-	double getClassValue(int exampleindex){
+	public double getClassValue(int exampleindex){
 		return (double) this.data[exampleindex][getNumberOfExplanatoryAttributes()];
 	}
 
 	public Attribute getExplanatorySet(int index) {
-		return explanatorySet[index];
+		return explanatorySet.get(index);
 	}
 
 	public ContinuousAttribute getClassAttribute() {
@@ -91,16 +93,16 @@ public class  Data {
 	}
 
 	public Attribute getExplanatoryAttribute(int index ){
-		return explanatorySet[index];
+		return explanatorySet.get(index);
 	}
 
 	public String toString(){
 		String value="";
 		for(int i=0;i<numberOfExamples;i++){
-			for(int j=0;j<explanatorySet.length;j++)
+			for(int j=0;j<explanatorySet.size();j++)
 				value+=data[i][j]+",";
 
-			value+=data[i][explanatorySet.length]+"\n";
+			value+=data[i][explanatorySet.size()]+"\n";
 		}
 		return value;
 

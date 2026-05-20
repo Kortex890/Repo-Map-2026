@@ -6,6 +6,8 @@ import data.DiscreteAttribute;
 import data.UnknownValueException;
 import utility.Keyboard;
 
+import java.util.TreeSet;
+
 public class RegressionTree {
 	Node root;
 	RegressionTree childTree[];
@@ -59,65 +61,46 @@ public class RegressionTree {
 	}
 
 	SplitNode determineBestSplitNode(Data trainingSet, int begin, int end) {
-
-		SplitNode bestSplitNode = null;
-		double minVariance = Double.MAX_VALUE; // Partiamo dal valore più alto possibile
-		Attribute bestAttribute = null; // Memorizziamo l'attributo migliore per l'ordinamento finale
+		TreeSet<SplitNode> ts= new TreeSet<SplitNode>();
 
 		int numAttributes = trainingSet.getNumberOfExplanatoryAttributes();
 
-		// 1. Per ciascun attributo indipendente...
 		for (int i = 0; i < numAttributes; i++) {
-
-			// Assumiamo che gli attributi esplicativi siano discreti in questa fase
 			DiscreteAttribute currentAttribute = (DiscreteAttribute) trainingSet.getExplanatoryAttribute(i);
-
-			// 2. Istanzia il tree.DiscreteNode associato
 			DiscreteNode currentNode = new DiscreteNode(trainingSet, begin, end, currentAttribute);
+			ts.add(currentNode);
 
-			// 3. Seleziona il nodo di split con minore varianza
-			if (currentNode.getVariance() < minVariance) {
-				minVariance = currentNode.getVariance();
-				bestSplitNode = currentNode;
-				bestAttribute = currentAttribute;
-			}
 		}
 
-		// 4. Ordina la porzione di trainingSet corrente rispetto all'attributo indipendente del nodo di split selezionato
-		if (bestAttribute != null) {
-			trainingSet.sort(bestAttribute, begin, end);
+		SplitNode bestSplitNode = ts.last();
+		if (bestSplitNode != null && bestSplitNode.getAttribute() != null) {
+			trainingSet.sort(bestSplitNode.getAttribute(), begin, end);
 		}
 
-		// 5. Restituisce il nodo selezionato
 		return bestSplitNode;
 	}
 
 	boolean isLeaf(Data trainingSet, int begin, int end, int numberOfExamplesPerLeaf) {
 		int currentNumberOfExamples = (end - begin) + 1;
 		if (currentNumberOfExamples <= numberOfExamplesPerLeaf) {
-			return true; // È un nodo foglia
+			return true; 
 		} else {
-			return false; // Non è un nodo foglia (può essere ancora splittato)
+			return false; 
 		}
 
 	}
-	// Scandisce ciascun ramo dell'albero completo dalla radice alla foglia/
-	public void printRules() {
+	
+	public void printRules(){
 		if (root instanceof LeafNode) {
-			// Caso limite: l'intero albero è solo una foglia
 			System.out.println("==> Class " + ((LeafNode) root).getPredictedClassValue());
 		} else {
-			// La radice è un nodo di split, avviamo l'attraversamento
 			SplitNode splitRoot = (SplitNode) root;
-
 			for (int i = 0; i < childTree.length; i++) {
-				// Recuperiamo le informazioni del ramo corrente per iniziare la stringa
-				// (es. "motor=A")
 				String condition = splitRoot.getAttribute().getName() +
-						splitRoot.getSplitInfo(i).comparator +
-						splitRoot.getSplitInfo(i).splitValue;
+						splitRoot.getSplitInfo(i).getComparator() + // Sostituito .comparator con .getComparator()
+						splitRoot.getSplitInfo(i).getSplitValue();   // Sostituito .splitValue con .getSplitValue()
 
-				// Invochiamo il metodo ricorsivo sul figlio passandogli la prima condizione
+				
 				childTree[i].printRules(condition);
 			}
 		}
@@ -125,20 +108,16 @@ public class RegressionTree {
 
 	public void printRules(String current){
 		if (root instanceof LeafNode) {
-			// Siamo arrivati alla foglia: termina l'attraversamento visualizzando la regola finale
 			System.out.println(current + " ==> Class " + ((LeafNode) root).getPredictedClassValue());
 		} else {
-			// Siamo in un nodo di split: dobbiamo concatenare e scendere ancora
 			SplitNode splitRoot = (SplitNode) root;
 
 			for (int i = 0; i < childTree.length; i++) {
-				// Aggiungiamo " AND " e la nuova condizione alla stringa current ereditata dal padre
 				String newCondition = current + " AND " +
 						splitRoot.getAttribute().getName() +
-						splitRoot.getSplitInfo(i).comparator +
-						splitRoot.getSplitInfo(i).splitValue;
+						splitRoot.getSplitInfo(i).getComparator() + // Usiamo il getter esistente in SplitInfo
+						splitRoot.getSplitInfo(i).getSplitValue();   // Usiamo il getter esistente in SplitInfo
 
-				// Chiamata ricorsiva al livello inferiore
 				childTree[i].printRules(newCondition);
 			}
 		}
@@ -151,7 +130,7 @@ public class RegressionTree {
 			int risp;
 			System.out.println(((SplitNode)root).formulateQuery());
 			risp = Keyboard.readInt();
-			if(risp == -1 || risp >= root.getNumberOfChildren()-1){
+			if(risp == -1 || risp >= root.getNumberOfChildren()){
 				throw new UnknownValueException("il valore dovrebbe essere tra 1 e "+ (root.getNumberOfChildren()-1));
 			}else{
 				return childTree[risp].PredictClass();
