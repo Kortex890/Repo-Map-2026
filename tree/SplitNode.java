@@ -6,7 +6,7 @@ import data.DiscreteAttribute;
 import java.util.List;
 import java.util.ArrayList;
 
-abstract class SplitNode extends Node {
+abstract class SplitNode extends Node implements Comparable<SplitNode> {
 	// Classe che colelzione informazioni descrittive dello split
 	class SplitInfo{
 		Object splitValue;
@@ -104,35 +104,24 @@ abstract class SplitNode extends Node {
 	}
 	SplitNode determineBestSplitNode(Data trainingSet, int begin, int end) {
 		SplitNode bestSplitNode = null;
-		double minVariance = Double.MAX_VALUE; // Inizializziamo al valore massimo possibile
-		Attribute bestAttribute = null; // Ci serve per ricordare su quale attributo ordinare alla fine
-			// Otteniamo il numero di attributi indipendenti dal dataset
+		double minVariance = Double.MAX_VALUE; 
+		Attribute bestAttribute = null; 
+		
 		int numAttributes = trainingSet.getNumberOfExplanatoryAttributes();
 
-			// 1. Per ciascun attributo indipendente...
 		for (int i = 0; i < numAttributes; i++) {
-			// Estraiamo l'attributo corrente (assumiamo siano discreti come da traccia precedente)
 			DiscreteAttribute currentAttribute = (DiscreteAttribute) trainingSet.getExplanatoryAttribute(i);
-
-			// 2. Istanziamo il tree.DiscreteNode associato
-			// NOTA: Assumiamo che il costruttore richieda (dataset, inizio, fine, attributo)
-			// e che la varianza venga calcolata automaticamente al suo interno.
 			DiscreteNode currentNode = new DiscreteNode(trainingSet, begin, end, currentAttribute);
 
-			// 3. Selezioniamo il nodo con minore varianza
 			if (currentNode.getVariance() < minVariance) {
 				minVariance = currentNode.getVariance();
 				bestSplitNode = currentNode;
 				bestAttribute = currentAttribute;
 			}
 		}
-
-			// 4. Ordina la porzione di trainingSet corrente rispetto all'attributo del nodo selezionato
 			if (bestAttribute != null) {
 				trainingSet.sort(bestAttribute, begin, end);
 			}
-
-			// 5. Restituisce il nodo selezionato
 			return bestSplitNode;
 		}
 
