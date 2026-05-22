@@ -1,51 +1,77 @@
-import data.*;
-import tree.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import data.Data;
+import data.TrainingDataException;
+import data.UnknownValueException;
+import tree.RegressionTree;
 import utility.Keyboard;
 
-import java.io.FileNotFoundException;
+public class MainTest {
 
-class MainTest {
-
-	public static void main(String[] args) {
-		char repeat;
-		do {
-			System.out.println("Training set:");
-			String fileName = Keyboard.readString();
-
-			try {
-				System.out.println("Starting data acquisition phase!");
-				Data trainingSet = new Data(fileName);
-
-				System.out.println("Starting learning phase!");
-				RegressionTree tree = new RegressionTree(trainingSet);
-
-				tree.printRules();
-				tree.printTree();
-
-				char repeatPrediction;
-				do {
-					System.out.println("Starting prediction phase!");
-					try {
-						double prediction = tree.PredictClass();
-						System.out.println(prediction);
-					} catch (UnknownValueException e) {
-						System.err.println(e.getMessage());
-					}
-
-					System.out.println("Would you repeat? (y/n)");
-					repeatPrediction = Keyboard.readChar();
-				} while (Character.toLowerCase(repeatPrediction) == 'y');
-
-			} catch (TrainingDataException e) {
-				System.err.println("data.TrainingDataException: " + e.getMessage());
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args){
+		
+		
+		
+		int decision=0;
+		do{
+		
+			System.out.println("Learn Regression Tree from data [1]");
+			System.out.println("Load Regression Tree from archive [2]");
+			decision=Keyboard.readInt();
+		}while(!(decision==1) && !(decision ==2));
+		
+		String trainingfileName="";
+		System.out.println("File name:");
+		trainingfileName=Keyboard.readString();
+		
+		RegressionTree tree=null;
+		if(decision==1)
+		{
+			System.out.println("Starting data acquisition phase!");
+			Data trainingSet=null;
+			try{
+			
+				trainingSet= new Data(trainingfileName+ ".dat");
 			}
-
-			System.out.println("Would you learn a new tree? (y/n)");
-			repeat = Keyboard.readChar();
-		} while (Character.toLowerCase(repeat) == 'y');
+			catch(TrainingDataException e){System.out.println(e);return;}
+		
+			System.out.println("Starting learning phase!");
+			tree=new RegressionTree(trainingSet);
+			try {
+				tree.salva(trainingfileName+".dmp");
+			} catch (IOException e) {
+				
+				System.out.println(e.toString());
+			}
+		} else
+			try {
+				tree=RegressionTree.carica(trainingfileName+".dmp");
+			} catch (ClassNotFoundException | IOException e) {
+				System.out.print(e);
+				return;
+			}
+			tree.printRules();
+	//		tree.printTree();
+			
+			char risp='y';
+			do{
+				System.out.println("Starting prediction phase!");
+				try {
+					System.out.println(tree.PredictClass());
+				} catch (UnknownValueException e) {
+					
+					System.out.println(e);
+				}
+				System.out.println("Would you repeat ? (y/n)");
+				risp=Keyboard.readChar();
+				
+			}while (Character.toUpperCase(risp)=='Y');
+		
+					
 	}
-}
 
-//jesus h. christ
+}
