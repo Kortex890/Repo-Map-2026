@@ -1,8 +1,9 @@
 package tree;
 
 import data.Data;
+import java.io.Serializable;
 
-public abstract class Node {
+public abstract class Node implements Serializable{
     static int idNodeCount = 0;
     int id_Node;
     int BeginExampleIndex;

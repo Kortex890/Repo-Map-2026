@@ -5,8 +5,9 @@ import data.ContinuousAttribute;
 import data.Data;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
-public class ContinuousNode extends SplitNode {
+public class ContinuousNode extends SplitNode implements Serializable {
 
     public ContinuousNode(Data trainingSet, int beginExampleIndex,
             int endExampleIndex, ContinuousAttribute attribute) {

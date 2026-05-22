@@ -1,14 +1,21 @@
 package tree;
 
 import data.Attribute;
+import data.ContinuousAttribute;
 import data.Data;
 import data.DiscreteAttribute;
 import data.UnknownValueException;
 import utility.Keyboard;
 
 import java.util.TreeSet;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
-public class RegressionTree {
+public class RegressionTree implements Serializable{
 	Node root;
 	RegressionTree childTree[];
 	public RegressionTree(Data trainingSet){
@@ -61,24 +68,28 @@ public class RegressionTree {
 	}
 
 	SplitNode determineBestSplitNode(Data trainingSet, int begin, int end) {
-		TreeSet<SplitNode> ts= new TreeSet<SplitNode>();
+    TreeSet<SplitNode> ts = new TreeSet<SplitNode>();
 
-		int numAttributes = trainingSet.getNumberOfExplanatoryAttributes();
+    for (int i = 0; i < trainingSet.getNumberOfExplanatoryAttributes(); i++) {
+        Attribute a = trainingSet.getExplanatoryAttribute(i);
+        SplitNode currentNode;
 
-		for (int i = 0; i < numAttributes; i++) {
-			DiscreteAttribute currentAttribute = (DiscreteAttribute) trainingSet.getExplanatoryAttribute(i);
-			DiscreteNode currentNode = new DiscreteNode(trainingSet, begin, end, currentAttribute);
-			ts.add(currentNode);
+        if (a instanceof DiscreteAttribute) {
+            currentNode = new DiscreteNode(trainingSet, begin, end, (DiscreteAttribute) a);
+        } else {
+            currentNode = new ContinuousNode(trainingSet, begin, end, (ContinuousAttribute) a);
+        }
 
-		}
+        ts.add(currentNode);
+    }
 
-		SplitNode bestSplitNode = ts.last();
-		if (bestSplitNode != null && bestSplitNode.getAttribute() != null) {
-			trainingSet.sort(bestSplitNode.getAttribute(), begin, end);
-		}
+    SplitNode bestSplitNode = ts.last();
+    if (bestSplitNode != null && bestSplitNode.getAttribute() != null) {
+        trainingSet.sort(bestSplitNode.getAttribute(), begin, end);
+    }
 
-		return bestSplitNode;
-	}
+    return bestSplitNode;
+}
 
 	boolean isLeaf(Data trainingSet, int begin, int end, int numberOfExamplesPerLeaf) {
 		int currentNumberOfExamples = (end - begin) + 1;
@@ -131,12 +142,27 @@ public class RegressionTree {
 			System.out.println(((SplitNode)root).formulateQuery());
 			risp = Keyboard.readInt();
 			if(risp == -1 || risp >= root.getNumberOfChildren()){
-				throw new UnknownValueException("il valore dovrebbe essere tra 1 e "+ (root.getNumberOfChildren()-1));
+				throw new UnknownValueException("The answer should be an integer between 0 and "+ (root.getNumberOfChildren()-1));
 			}else{
 				return childTree[risp].PredictClass();
 			}
 		}
 	}
 
+	public void salva(String nomeFile) throws IOException {
+    ObjectOutputStream out = new ObjectOutputStream(
+        new FileOutputStream(nomeFile));
+    out.writeObject(this);
+    out.close();
+}
+
+	public static RegressionTree carica(String nomeFile) 
+			throws IOException, ClassNotFoundException {
+		ObjectInputStream in = new ObjectInputStream(
+			new FileInputStream(nomeFile));
+		RegressionTree tree = (RegressionTree) in.readObject();
+		in.close();
+		return tree;
+	}
 
 }
