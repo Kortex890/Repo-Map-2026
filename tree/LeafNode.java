@@ -1,8 +1,9 @@
 package tree;
 
 import data.Data;
+import java.io.Serializable;
 
-public class LeafNode extends Node{
+public class LeafNode extends Node implements Serializable{
     double predictedClassValue;
     public LeafNode(Data trainingSet, int beginExampleIndex, int endExampleIndex) {
         super(trainingSet, beginExampleIndex, endExampleIndex);
