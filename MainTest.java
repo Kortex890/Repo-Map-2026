@@ -1,11 +1,13 @@
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
-import data.Data;
-import data.TrainingDataException;
-import data.UnknownValueException;
-import tree.RegressionTree;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 import utility.Keyboard;
+
 
 public class MainTest {
 
@@ -14,7 +16,28 @@ public class MainTest {
 	 */
 	public static void main(String[] args){
 		
-		
+		InetAddress addr;
+		try {
+			addr = InetAddress.getByName(args[0]);
+		} catch (UnknownHostException e) {
+			System.out.println(e.toString());
+			return;
+		}
+		Socket socket=null;
+		ObjectOutputStream out=null;
+		ObjectInputStream in=null;
+		try {
+			socket = new Socket(args[0], new Integer(args[1]).intValue());
+			System.out.println(socket);		
+			out = new ObjectOutputStream(socket.getOutputStream());
+			in = new ObjectInputStream(socket.getInputStream());	; // stream con richieste del client
+			
+		}  catch (IOException e) {
+			System.out.println(e.toString());
+			return;
+		}
+
+		String answer="";
 		
 		int decision=0;
 		do{
@@ -24,54 +47,80 @@ public class MainTest {
 			decision=Keyboard.readInt();
 		}while(!(decision==1) && !(decision ==2));
 		
-		String trainingfileName="";
+		String tableName="";
 		System.out.println("File name:");
-		trainingfileName=Keyboard.readString();
+		tableName=Keyboard.readString();
+		try{
 		
-		RegressionTree tree=null;
 		if(decision==1)
 		{
 			System.out.println("Starting data acquisition phase!");
-			Data trainingSet=null;
-			try{
 			
-				trainingSet= new Data(trainingfileName+ ".dat");
-			}
-			catch(TrainingDataException e){System.out.println(e);return;}
-		
-			System.out.println("Starting learning phase!");
-			tree=new RegressionTree(trainingSet);
-			try {
-				tree.salva(trainingfileName+".dmp");
-			} catch (IOException e) {
-				
-				System.out.println(e.toString());
-			}
-		} else
-			try {
-				tree=RegressionTree.carica(trainingfileName+".dmp");
-			} catch (ClassNotFoundException | IOException e) {
-				System.out.print(e);
+			
+			
+			out.writeObject(0);
+			out.writeObject(tableName);
+			answer=in.readObject().toString();
+			if(!answer.equals("OK")){
+				System.out.println(answer);
 				return;
 			}
-			tree.printRules();
-	//		tree.printTree();
-			
-			char risp='y';
-			do{
-				System.out.println("Starting prediction phase!");
-				try {
-					System.out.println(tree.PredictClass());
-				} catch (UnknownValueException e) {
-					
-					System.out.println(e);
-				}
-				System.out.println("Would you repeat ? (y/n)");
-				risp=Keyboard.readChar();
-				
-			}while (Character.toUpperCase(risp)=='Y');
+
+			System.out.println("Starting learning phase!");
+			out.writeObject(1);
 		
-					
+		}
+		else
+		{
+			out.writeObject(2);
+			out.writeObject(tableName);
+			
+		}
+		
+		answer=in.readObject().toString();
+		if(!answer.equals("OK")){
+			System.out.println(answer);
+			return;
+		}
+		
+		char risp='y';
+		
+		do{
+			out.writeObject(3);
+			
+			System.out.println("Starting prediction phase!");
+			answer=in.readObject().toString();
+		
+			
+			while(answer.equals("QUERY")){
+				// Formualting query, reading answer
+				answer=in.readObject().toString();
+				System.out.println(answer);
+				int path=Keyboard.readInt();
+				out.writeObject(path);
+				answer=in.readObject().toString();
+			}
+		
+			if(answer.equals("OK"))
+			{ // Reading prediction
+				answer=in.readObject().toString();
+				System.out.println("Predicted class:"+answer);
+				
+			}
+			else //Printing error message
+				System.out.println(answer);
+			
+		
+			System.out.println("Would you repeat ? (y/n)");
+			risp=Keyboard.readChar();
+				
+		}while (Character.toUpperCase(risp)=='Y');
+		
+		}
+		catch(IOException | ClassNotFoundException e){
+			System.out.println(e.toString());
+			
+		}
 	}
 
 }

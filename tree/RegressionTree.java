@@ -149,6 +149,28 @@ public class RegressionTree implements Serializable{
 		}
 	}
 
+	public String formulateQuery() {
+		if (root instanceof LeafNode)
+			return null;
+		return ((SplitNode) root).formulateQuery();
+	}
+
+	public RegressionTree selectChild(int child) throws UnknownValueException {
+		if (root instanceof LeafNode)
+			return this;
+		if (child < 0 || child >= root.getNumberOfChildren())
+			throw new UnknownValueException("The answer should be an integer between 0 and " + (root.getNumberOfChildren() - 1));
+		return childTree[child];
+	}
+
+	public double getPredictedClassValue() {
+		return ((LeafNode) root).getPredictedClassValue();
+	}
+
+	public boolean isLeaf() {
+		return root instanceof LeafNode;
+	}
+
 	public void salva(String nomeFile) throws IOException {
     ObjectOutputStream out = new ObjectOutputStream(
         new FileOutputStream(nomeFile));
